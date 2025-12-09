@@ -7,7 +7,8 @@
 # ----------------------------------------------------------------------------
 
 from qiime2.plugin import (Plugin, Int, Range, Collection, Str, Choices, Bool,
-                           Float, Metadata, Visualization, Citations, List)
+                           Float, Metadata, Visualization, Citations, List,
+                           Properties)
 
 from q2_types.feature_table import (
     FeatureTable, Frequency, RelativeFrequency, PresenceAbsence
@@ -88,7 +89,8 @@ _resample_parameters = {
     'replacement': Bool
 }
 _resample_outputs = {
-    'resampled_tables': Collection[FeatureTable[Frequency]]
+    'resampled_tables':
+    Collection[FeatureTable[Frequency]] % Properties("resampled")
 }
 _resample_input_descriptions = {
     'table': _feature_table_description
@@ -146,7 +148,8 @@ _average_alpha_diversity_description = (
 plugin.methods.register_function(
     function=q2_boots.alpha_average,
     inputs={
-        'data': Collection[SampleData[AlphaDiversity]]
+        'data':
+        Collection[SampleData[AlphaDiversity]] % Properties("resampled")
     },
     parameters=_alpha_average_parameters,
     outputs={
@@ -186,7 +189,9 @@ plugin.pipelines.register_function(
     function=q2_boots.alpha_collection,
     inputs=_diversity_inputs,
     parameters=_alpha_collection_parameters,
-    outputs={'alpha_diversities': Collection[SampleData[AlphaDiversity]]},
+    outputs={'alpha_diversities':
+             Collection[SampleData[AlphaDiversity]] % Properties("resampled")
+             },
     input_descriptions=_diversity_input_descriptions,
     parameter_descriptions=_alpha_collection_parameter_descriptions,
     output_descriptions={
@@ -246,7 +251,7 @@ _beta_average_parameter_descriptions = {
 plugin.methods.register_function(
     function=q2_boots.beta_average,
     inputs={
-        'data': Collection[DistanceMatrix],
+        'data': Collection[DistanceMatrix] % Properties("resampled"),
     },
     parameters=_beta_average_parameters,
     outputs={'average_distance_matrix': DistanceMatrix},
@@ -299,7 +304,9 @@ plugin.pipelines.register_function(
     function=q2_boots.beta_collection,
     inputs=_diversity_inputs,
     parameters=_beta_collection_parameters,
-    outputs={'distance_matrices': Collection[DistanceMatrix]},
+    outputs={'distance_matrices':
+             Collection[DistanceMatrix] % Properties("resampled")
+             },
     input_descriptions=_diversity_input_descriptions,
     output_descriptions={
         'distance_matrices': ('`n` beta diversity distance matrices, each '
